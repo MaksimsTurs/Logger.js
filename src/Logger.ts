@@ -11,7 +11,7 @@ import isItemExist from "./utils/is-item-exist.util.ts";
 
 export default class Logger<M extends string | number> implements LoggerImpl<M> {
   private readonly options?: LoggerOptions<M> = undefined
-  private currModes?: Set<M>         = undefined;
+  private currModes?: Set<M>                  = undefined;
 
   public constructor(options: LoggerOptions<M>) {
     this.options = options;
@@ -23,8 +23,34 @@ export default class Logger<M extends string | number> implements LoggerImpl<M> 
     return this;
   };
 
-  public info = {
-    file: async (message: string): Promise<void> => {
+  public terminal = {
+    info: (message: string, ...data: any[]): void => {
+      if(!this.currModes || (this.currModes && this.currModes.has(this.options!.mode))) {
+        terminal(STRING.LOG_LEVEL.INFO, message, ...data);
+      }
+    },
+    warn: (message: string, ...data: any[]): void => {
+      if(!this.currModes) {
+        throw new Error("You need to set the modes with \"in\" function first!");
+      }
+
+      if(this.currModes.has(this.options!.mode)) {
+        terminal(STRING.LOG_LEVEL.WARN, message, ...data);
+      }
+    },
+    error: (message: string, ...data: any[]): void => {
+      if(!this.currModes) {
+        throw new Error("You need to set the modes with \"in\" function first!");
+      }
+
+      if(this.currModes.has(this.options!.mode)) {
+        terminal(STRING.LOG_LEVEL.ERROR, message, ...data);
+      }
+    }
+  };
+
+  public file = {
+    info: async (message: string): Promise<void> => {
       if(!this.currModes) {
         throw new Error("You need to set the modes with \"in\" function first!");
       }
@@ -33,19 +59,7 @@ export default class Logger<M extends string | number> implements LoggerImpl<M> 
         await file<M>(STRING.LOG_LEVEL.INFO, message, this.options!);
       }
     },
-    terminal: (message: string, ...data: any[]): void => {
-      if(!this.currModes) {
-        throw new Error("You need to set the modes with \"in\" function first!");
-      }
-
-      if(this.currModes.has(this.options!.mode)) {
-        terminal(STRING.LOG_LEVEL.INFO, message, ...data);
-      }
-    }
-  };
-
-  public warn = {
-    file: async (message: string): Promise<void> => {
+    warn: async (message: string): Promise<void> => {
       if(!this.currModes) {
         throw new Error("You need to set the modes with \"in\" function first!");
       }
@@ -54,36 +68,15 @@ export default class Logger<M extends string | number> implements LoggerImpl<M> 
         await file<M>(STRING.LOG_LEVEL.WARN, message, this.options!);
       }
     },
-    terminal: (message: string, ...data: any[]): void => {
+    error: async (message: string): Promise<void> => {
       if(!this.currModes) {
         throw new Error("You need to set the modes with \"in\" function first!");
       }
 
       if(this.currModes.has(this.options!.mode)) {
-        terminal(STRING.LOG_LEVEL.WARN, message, ...data);
-      }
-    }
-  };
-
-  public error = {
-    file: async (message: string): Promise<void> => {
-      if(!this.currModes) {
-        throw new Error("You need to set the modes with \"in\" function first!");
-      }
-
-      if(this.currModes.has(this.options!.mode)) {
-        await file<M>(STRING.LOG_LEVEL.WARN, message, this.options!);
+        await file<M>(STRING.LOG_LEVEL.ERROR, message, this.options!);
       }
     },
-    terminal: (message: string, ...data: any[]): void => {
-      if(!this.currModes) {
-        throw new Error("You need to set the modes with \"in\" function to set in wich modes this log can be executed!");
-      }
-
-      if(this.currModes.has(this.options!.mode)) {
-        terminal(STRING.LOG_LEVEL.ERROR, message, ...data);
-      }
-    }
   };
 };
 

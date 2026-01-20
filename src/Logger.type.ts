@@ -5,18 +5,24 @@ export type LoggerFileOptions = {
 };
 
 export type LoggerOptions<M extends string | number> = {
-  mode:        M
-  fileOptions: LoggerFileOptions
+  mode:         M
+  fileOptions?: LoggerFileOptions
 };
 
 export interface LoggerImpl<M extends string | number> {
-  info:              LoggerLevelWrapper
-  warn:              LoggerLevelWrapper
-  error:             LoggerLevelWrapper
-  in:                (modes: Iterable<M>) => Logger<M>
+  terminal: LoggerTerminalWrapper
+  file:     LoggerFileWrapper
+  in:       (modes: Iterable<M>) => Logger<M>
 };
 
-export type LoggerLevelWrapper = {
-  file:     (message: string) => Promise<void>
-  terminal: (message: string, data: any[]) => void
+export type LoggerTerminalWrapper = {
+  info:  (message: string, data: any[]) => void
+  warn:  (message: string, data: any[]) => void
+  error: (message: string, data: any[]) => void
+};
+
+export type LoggerFileWrapper = {
+  info:  (message: string) => Promise<void>
+  warn:  (message: string) => Promise<void>
+  error: (message: string) => Promise<void>
 };
