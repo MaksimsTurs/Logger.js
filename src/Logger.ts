@@ -46,6 +46,10 @@ export default class Logger<M extends string | number> implements LoggerImpl<M> 
 
   public file = {
     info: async (message: string): Promise<void> => {
+      if(!this.options?.fileOptions?.dirPath) {
+        throw new TypeError(`The "fileOptions.dirPath" is typeof ${typeof this.options?.fileOptions?.dirPath} but must be string!`);
+      }
+
       if(!this.isFilterUsed() || this.isFilterHasCurrentMode()) {
         await file<M>(STRING.LOG_LEVEL.INFO, message, this.options!);
       }
@@ -53,6 +57,10 @@ export default class Logger<M extends string | number> implements LoggerImpl<M> 
       this.currModes = undefined
     },
     warn: async (message: string): Promise<void> => {
+      if(!this.options?.fileOptions?.dirPath) {
+        throw new TypeError(`The "fileOptions.dirPath" is typeof ${typeof this.options?.fileOptions?.dirPath} but must be string!`);
+      }
+
       if(!this.isFilterUsed() || this.isFilterHasCurrentMode()) {
         await file<M>(STRING.LOG_LEVEL.WARN, message, this.options!);
       }
@@ -60,6 +68,10 @@ export default class Logger<M extends string | number> implements LoggerImpl<M> 
       this.currModes = undefined;
     },
     error: async (message: string): Promise<void> => {
+      if(!this.options?.fileOptions?.dirPath) {
+        throw new TypeError(`The "fileOptions.dirPath" is typeof ${typeof this.options?.fileOptions?.dirPath} but must be string!`);
+      }
+
       if(!this.isFilterUsed() || this.isFilterHasCurrentMode()) {
         await file<M>(STRING.LOG_LEVEL.ERROR, message, this.options!);
       }
