@@ -1,0 +1,29 @@
+[INFO 16:51:59]: Suck {
+  "name": "Maksims",
+  "age": 25,
+  "hobbies": [
+    "Programming"
+  ],
+  "map": {}
+}
+[INFO 16:53:07]: Suck {
+  "name": "Maksims",
+  "age": 25,
+  "hobbies": [
+    "Programming"
+  ]
+}
+[INFO 16:53:18]: Very long text {
+  "name": "Maksims",
+  "age": 25,
+  "hobbies": [
+    "Programming"
+  ]
+}
+[INFO 17:00:56]: Very long text {
+  "name": "Maksims",
+  "age": 25,
+  "hobbies": [
+    "Programming"
+  ]
+}

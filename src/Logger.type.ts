@@ -2,6 +2,7 @@ import Logger from "./Logger.ts";
 
 export type LoggerFileOptions = {
   dirPath: string
+  space?:  number
 };
 
 export type LoggerOptions<M extends string | number> = {
@@ -10,19 +11,13 @@ export type LoggerOptions<M extends string | number> = {
 };
 
 export interface LoggerImpl<M extends string | number> {
-  terminal: LoggerTerminalWrapper
-  file:     LoggerFileWrapper
+  terminal: LoggerFuncsWrapper
+  file:     LoggerFuncsWrapper
   in:       (modes: Iterable<M>) => Logger<M>
 };
 
-export type LoggerTerminalWrapper = {
+export type LoggerFuncsWrapper = {
   info:  (message: string, data: any[]) => void
   warn:  (message: string, data: any[]) => void
   error: (message: string, data: any[]) => void
-};
-
-export type LoggerFileWrapper = {
-  info:  (message: string) => Promise<void>
-  warn:  (message: string) => Promise<void>
-  error: (message: string) => Promise<void>
 };
