@@ -1,15 +1,18 @@
 import STRING from "./const/STRING.const.ts";
 
 import type { LoggerImpl, LoggerOptions } from "./Logger.type.ts";
+import type { Colorizer } from "colorizer.js/src/colorizer.type.ts";
 
+import colorizer from "colorizer.js";
 import { mkdir, writeFile, appendFile } from "node:fs/promises";
 
 import createTimeString from "./utils/create-time-string.util.ts";
 import createFileName from "./utils/create-file-name.util.ts";
-import colorizeLogLevel from "./utils/colorize-log-level.util.ts";
 import { isObject, isItemExist } from "./utils/is.util.ts";
 
 export default class Logger<M extends string | number> implements LoggerImpl<M> {
+  public static colorizer: Colorizer = colorizer()
+  
   public constructor(options: LoggerOptions<M>) {
     this.options = options;
   };
@@ -114,7 +117,7 @@ export default class Logger<M extends string | number> implements LoggerImpl<M> 
   };
 
   private createTerminalMessage(level: string, message: string): string {
-    return `${colorizeLogLevel(level, `[${level} ${createTimeString()}]:`)} ${message}`;
+    return `${this.colorize(level, `[${level} ${createTimeString()}]:`)} ${message}`;
   }
 
   private createFileMessage(level: string, message: string, data: any[]): string {
@@ -132,5 +135,30 @@ export default class Logger<M extends string | number> implements LoggerImpl<M> 
     logMessage += "\n";
 
     return logMessage;
+  }
+
+  private colorize(level: string, message: string): string {
+    switch(level) {
+      case STRING.LOG_LEVEL.ERROR:
+        if(this.options?.customStyles?.error) {
+          return this.options.customStyles.error.text(message);
+        }
+        
+        return colorizer().bold().font().rgb(255, 0, 0).text(message);
+      case STRING.LOG_LEVEL.INFO:
+        if(this.options?.customStyles?.info) {
+          return this.options.customStyles.info.text(message);
+        }
+
+        return colorizer().bold().font().rgb(0, 0, 255).text(message);
+      case STRING.LOG_LEVEL.WARN:
+        if(this.options?.customStyles?.warn) {
+          return this.options.customStyles.warn.text(message);
+        }
+
+        return colorizer().bold().font().rgb(255, 255, 0).text(message);
+      default:
+        return message;
+    }
   }
 };

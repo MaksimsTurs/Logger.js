@@ -1,3 +1,5 @@
+import type { Colorizer } from "colorizer.js/src/colorizer.type.ts";
+
 import Logger from "./Logger.ts";
 
 export type LoggerFileOptions = {
@@ -6,8 +8,15 @@ export type LoggerFileOptions = {
 };
 
 export type LoggerOptions<M extends string | number> = {
-  mode:         M
-  fileOptions?: LoggerFileOptions
+  mode:          M
+  customStyles?: LoggerCustomStyles
+  fileOptions?:  LoggerFileOptions
+};
+
+export type LoggerCustomStyles = {
+  info?:  Colorizer
+  warn?:  Colorizer
+  error?: Colorizer
 };
 
 export interface LoggerImpl<M extends string | number> {
