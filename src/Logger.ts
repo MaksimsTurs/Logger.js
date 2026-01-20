@@ -10,9 +10,6 @@ import colorizeLogLevel from "./utils/colorize-log-level.util.ts";
 import isItemExist from "./utils/is-item-exist.util.ts";
 
 export default class Logger<M extends string | number> implements LoggerImpl<M> {
-  private readonly options?: LoggerOptions<M> = undefined
-  private currModes?: Set<M>                  = undefined;
-
   public constructor(options: LoggerOptions<M>) {
     this.options = options;
   };
@@ -25,58 +22,61 @@ export default class Logger<M extends string | number> implements LoggerImpl<M> 
 
   public terminal = {
     info: (message: string, ...data: any[]): void => {
-      if(!this.currModes || (this.currModes && this.currModes.has(this.options!.mode))) {
+      if(!this.isFilterUsed() || this.isFilterHasCurrentMode()) {
         terminal(STRING.LOG_LEVEL.INFO, message, ...data);
       }
+
+      this.currModes = undefined;
     },
     warn: (message: string, ...data: any[]): void => {
-      if(!this.currModes) {
-        throw new Error("You need to set the modes with \"in\" function first!");
-      }
-
-      if(this.currModes.has(this.options!.mode)) {
+      if(!this.isFilterUsed() || this.isFilterHasCurrentMode()) {
         terminal(STRING.LOG_LEVEL.WARN, message, ...data);
       }
+
+      this.currModes = undefined
     },
     error: (message: string, ...data: any[]): void => {
-      if(!this.currModes) {
-        throw new Error("You need to set the modes with \"in\" function first!");
-      }
-
-      if(this.currModes.has(this.options!.mode)) {
+      if(!this.isFilterUsed() || this.isFilterHasCurrentMode()) {
         terminal(STRING.LOG_LEVEL.ERROR, message, ...data);
       }
+
+      this.currModes = undefined
     }
   };
 
   public file = {
     info: async (message: string): Promise<void> => {
-      if(!this.currModes) {
-        throw new Error("You need to set the modes with \"in\" function first!");
-      }
-
-      if(this.currModes.has(this.options!.mode)) {
+      if(!this.isFilterUsed() || this.isFilterHasCurrentMode()) {
         await file<M>(STRING.LOG_LEVEL.INFO, message, this.options!);
       }
+
+      this.currModes = undefined
     },
     warn: async (message: string): Promise<void> => {
-      if(!this.currModes) {
-        throw new Error("You need to set the modes with \"in\" function first!");
-      }
-
-      if(this.currModes.has(this.options!.mode)) {
+      if(!this.isFilterUsed() || this.isFilterHasCurrentMode()) {
         await file<M>(STRING.LOG_LEVEL.WARN, message, this.options!);
       }
+
+      this.currModes = undefined;
     },
     error: async (message: string): Promise<void> => {
-      if(!this.currModes) {
-        throw new Error("You need to set the modes with \"in\" function first!");
-      }
-
-      if(this.currModes.has(this.options!.mode)) {
+      if(!this.isFilterUsed() || this.isFilterHasCurrentMode()) {
         await file<M>(STRING.LOG_LEVEL.ERROR, message, this.options!);
       }
+
+      this.currModes = undefined
     },
+  };
+
+  private readonly options?: LoggerOptions<M> = undefined;
+  private currModes?: Set<M>                  = undefined;
+
+  private isFilterUsed(): boolean {
+    return !!this.currModes;
+  };
+
+  private isFilterHasCurrentMode(): boolean {
+    return !!(this.isFilterUsed() && this.currModes!.has(this.options!.mode));
   };
 };
 
