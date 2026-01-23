@@ -1,5 +1,7 @@
 import STRING from "./const/STRING.const.ts";
 
+import pckg from "../package.json" with { type: "json" };
+
 import type { LoggerImpl, LoggerOptions } from "./Logger.type.ts";
 import type { Colorizer } from "colorizer.js/src/colorizer.type.ts";
 
@@ -8,10 +10,11 @@ import { mkdir, writeFile, appendFile } from "node:fs/promises";
 
 import createTimeString from "./utils/create-time-string.util.ts";
 import createFileName from "./utils/create-file-name.util.ts";
-import { isObject, isItemExist } from "./utils/is.util.ts";
+import { isObject, isItemExist, isAlphabetic } from "./utils/is.util.ts";
+import REGEXP from "./const/REGEXP.const.ts";
 
 export default class Logger<M extends string | number> implements LoggerImpl<M> {
-  public static colorizer: Colorizer = colorizer()
+  public static colorizer: Colorizer = colorizer();
   
   public constructor(options: LoggerOptions<M>) {
     this.options = options;
@@ -19,7 +22,7 @@ export default class Logger<M extends string | number> implements LoggerImpl<M> 
 
   public in(modes: Iterable<M>): Logger<M> {
     this.currModes = new Set<M>(modes);
-    
+
     return this;
   };
 
@@ -117,11 +120,11 @@ export default class Logger<M extends string | number> implements LoggerImpl<M> 
   };
 
   private createTerminalMessage(level: string, message: string): string {
-    return `${this.colorize(level, `[${level} ${createTimeString()}]:`)} ${message}`;
-  }
+    return `${this.colorize(level, this.parseLogFormat(level))} ${message}`;
+  };
 
   private createFileMessage(level: string, message: string, data: any[]): string {
-    let logMessage: string = `[${level} ${createTimeString()}]: ${message} `;
+    let logMessage: string = `${this.parseLogFormat(level)} ${message}`;
     const { fileOptions } = this.options!;
 
     for(let index: number = 0; index < data.length; index++) {
@@ -135,30 +138,79 @@ export default class Logger<M extends string | number> implements LoggerImpl<M> 
     logMessage += "\n";
 
     return logMessage;
-  }
+  };
+
+  private parseLogFormat(level: string = ""): string {
+    REGEXP.TOKENS.lastIndex = 0;
+
+    const date: string = createTimeString();
+    const format: string | undefined = this.options?.styling?.logFormat;
+
+    if(!format) {
+      return `[${level} ${date}]:`;
+    }
+
+    let parsed: string = "";
+
+    while(REGEXP.TOKENS.lastIndex < format.length) {
+      if(isAlphabetic(format[REGEXP.TOKENS.lastIndex])) {
+        const match: RegExpExecArray | null = REGEXP.TOKENS.exec(format);
+
+        if(match?.at(0)) {
+          const value: string = match.at(0)!;
+          
+          switch(value) {
+            case "lvl":
+              parsed += level;
+            break;
+            case "hh":
+              parsed += `${date[0]}${date[1]}`;
+            break;
+            case "mm":
+              parsed += `${date[3]}${date[4]}`;
+            break;
+            case "ss":
+              parsed += `${date[6]}${date[7]}`;
+            break;
+            case "tt":
+              parsed += `00`;
+            break;
+          }
+        } else {
+          console.warn(`[Logger.js ${pckg.version}]: Unknown token ${format[REGEXP.TOKENS.lastIndex]} on col ${REGEXP.TOKENS.lastIndex}!`);
+          REGEXP.TOKENS.lastIndex++;
+        }
+      } else {
+        parsed += format[REGEXP.TOKENS.lastIndex];
+        REGEXP.TOKENS.lastIndex++;
+      }
+    }
+
+    return parsed;
+  };
 
   private colorize(level: string, message: string): string {
     switch(level) {
       case STRING.LOG_LEVEL.ERROR:
-        if(this.options?.customStyles?.error) {
-          return this.options.customStyles.error.text(message);
+        if(this.options?.styling?.colors?.error) {
+          return this.options.styling?.colors.error.text(message);
         }
         
         return colorizer().bold().font().rgb(255, 0, 0).text(message);
       case STRING.LOG_LEVEL.INFO:
-        if(this.options?.customStyles?.info) {
-          return this.options.customStyles.info.text(message);
+        if(this.options?.styling?.colors?.info) {
+          return this.options.styling?.colors.info.text(message);
         }
 
         return colorizer().bold().font().rgb(0, 0, 255).text(message);
       case STRING.LOG_LEVEL.WARN:
-        if(this.options?.customStyles?.warn) {
-          return this.options.customStyles.warn.text(message);
+        if(this.options?.styling?.colors?.warn) {
+          return this.options.styling?.colors.warn.text(message);
         }
 
         return colorizer().bold().font().rgb(255, 255, 0).text(message);
       default:
         return message;
-    }
-  }
+    };
+  };
 };

@@ -8,12 +8,17 @@ export type LoggerFileOptions = {
 };
 
 export type LoggerOptions<M extends string | number> = {
-  mode:          M
-  customStyles?: LoggerCustomStyles
-  fileOptions?:  LoggerFileOptions
+  mode:         M
+  styling?:     LoggerStyling
+  fileOptions?: LoggerFileOptions
 };
 
-export type LoggerCustomStyles = {
+export type LoggerStyling = {
+  colors?:    LoggerStylingColors,
+  logFormat?: string
+};
+
+export type LoggerStylingColors = {
   info?:  Colorizer
   warn?:  Colorizer
   error?: Colorizer

@@ -6,7 +6,8 @@ Small and simple logging library to log the information in to files and terminal
   + [Documentation](#documentation)
     + [Creating a logger](#creating-a-logger)
     + [Log into terminal and file](#log-into-terminal-and-file)
-    + [Custom prefix styles](#custom-prefix-styles)
+    + [Custom time color](#custom-time-format)
+    + [Custom time format](#custom-time-format)
 
 ## [Documentation](#documentation)
 ### [Creating a logger](#creating-a-logger)
@@ -67,14 +68,35 @@ import { logger } from "index.js"
 
 logger.terminal.info("This message will be logged in any mode!");
 ```
-You can specify custom styles for all three log levels (info, warn and error).
+## [Custom time color](#custom-time-color)
+You can specify custom color for all three log levels (info, warn and error).
 ```js
 const logger = new Logger<"prod", "dev">({
   // ... default options
-  customStyles: {
-    info: Logger.colorizer.bold().font().rgb(100, 100, 255),
-    error: Logger.colorizer.bold().font().rgb(255, 100, 100),
-    warn: Logger.colorizer.bold().font().rgb(200, 200, 100)
+  styling: {
+    colors: {
+      info: Logger.colorizer.bold().font().rgb(100, 100, 255),
+      error: Logger.colorizer.bold().font().rgb(255, 100, 100),
+      warn: Logger.colorizer.bold().font().rgb(200, 200, 100)
+    }
   }
 })
+```
+## [Custom time color](#custom-time-color)
+
+You can specify custom time format for all three log levels (info, warn and error).
+The libarary support 4 format vars, `hh` (hour), `mm` (minutes), `ss` (seconds) and `lvl` (log level).
+```js
+const logger = new Logger<"prod", "dev">({
+  // ... default options
+  styling: {
+    logFormat: "lvl hh::mm::ss"
+  }
+})
+
+logger.terminal.info("Test the custom time format.")
+```
+This will log follow message.
+```
+  INFO 12::54::56 Test the custom time format.
 ```
