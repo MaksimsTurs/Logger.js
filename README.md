@@ -6,7 +6,7 @@ Small and simple logging library to log the information in to files and terminal
   + [Documentation](#documentation)
     + [Creating a logger](#creating-a-logger)
     + [Log into terminal and file](#log-into-terminal-and-file)
-    + [Custom time color](#custom-time-format)
+    + [Custom time color](#custom-time-color)
     + [Custom time format](#custom-time-format)
 
 ## [Documentation](#documentation)
@@ -82,7 +82,7 @@ const logger = new Logger<"prod", "dev">({
   }
 })
 ```
-## [Custom time color](#custom-time-color)
+## [Custom time format](#custom-time-format)
 
 You can specify custom time format for all three log levels (info, warn and error).
 The libarary support 4 format vars, `hh` (hour), `mm` (minutes), `ss` (seconds) and `lvl` (log level).

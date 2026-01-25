@@ -1,4 +1,5 @@
 import STRING from "./const/STRING.const.ts";
+import REGEXP from "./const/REGEXP.const.ts";
 
 import pckg from "../package.json" with { type: "json" };
 
@@ -11,7 +12,6 @@ import { mkdir, writeFile, appendFile } from "node:fs/promises";
 import createTimeString from "./utils/create-time-string.util.ts";
 import createFileName from "./utils/create-file-name.util.ts";
 import { isObject, isItemExist, isAlphabetic } from "./utils/is.util.ts";
-import REGEXP from "./const/REGEXP.const.ts";
 
 export default class Logger<M extends string | number> implements LoggerImpl<M> {
   public static colorizer: Colorizer = colorizer();
